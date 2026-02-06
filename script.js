@@ -2,71 +2,74 @@
 const envelope = document.getElementById("envelope-container");
 const letter = document.getElementById("letter-container");
 const noBtn = document.querySelector(".no-btn");
-const yesBtn = document.querySelector(".btn[alt='Yes']");
+const yesBtn = document.querySelector(".yes-btn");
 
 const title = document.getElementById("letter-title");
 const catImg = document.getElementById("letter-cat");
 const buttons = document.getElementById("letter-buttons");
 const finalText = document.getElementById("final-text");
 
-// Click Envelope
+// ---------------- Envelope Click ----------------
 
 envelope.addEventListener("click", () => {
     envelope.style.display = "none";
     letter.style.display = "flex";
 
-    setTimeout( () => {
-        document.querySelector(".letter-window").classList.add("open");
-    },50);
+    setTimeout(() => {
+      document.querySelector(".letter-window").classList.add("open");
+    }, 50);
 });
 
-// Logic to move the NO btn
+// ---------------- NO Button Logic ----------------
 
-noBtn.addEventListener("mouseover", () => {
-    const min = 200;
-    const max = 200;
+function moveNoButton() {
+  // Get button position relative to viewport
+  const rect = noBtn.getBoundingClientRect();
 
-    const distance = Math.random() * (max - min) + min;
-    const angle = Math.random() * Math.PI * 2;
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
 
-    const moveX = Math.cos(angle) * distance;
-    const moveY = Math.sin(angle) * distance;
+  // Smaller movement on mobile
+  const maxMove = screenWidth < 600 ? 70 : 200;
 
-    noBtn.style.transition = "transform 0.3s ease";
-    noBtn.style.transform = `translate(${moveX}px, ${moveY}px)`;
+  let moveX = (Math.random() - 0.5) * maxMove * 2;
+  let moveY = (Math.random() - 0.5) * maxMove * 2;
+
+  // Prevent moving outside screen
+  const futureLeft = rect.left + moveX;
+  const futureRight = rect.right + moveX;
+  const futureTop = rect.top + moveY;
+  const futureBottom = rect.bottom + moveY;
+
+  if (futureLeft < 0 || futureRight > screenWidth) {
+    moveX = -moveX;
+  }
+
+  if (futureTop < 0 || futureBottom > screenHeight) {
+    moveY = -moveY;
+  }
+
+  noBtn.style.transition = "transform 0.25s ease";
+  noBtn.style.transform = `translate(${moveX}px, ${moveY}px)`;
+}
+
+// Desktop hover
+noBtn.addEventListener("mouseover", moveNoButton);
+
+// Mobile touch
+noBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    moveNoButton();
 });
 
-// Logic to make YES btn to grow
-
-// let yesScale = 1;
-
-// yesBtn.style.position = "relative"
-// yesBtn.style.transformOrigin = "center center";
-// yesBtn.style.transition = "transform 0.3s ease";
-
-// noBtn.addEventListener("click", () => {
-//     yesScale += 2;
-
-//     if (yesBtn.style.position !== "fixed") {
-//         yesBtn.style.position = "fixed";
-//         yesBtn.style.top = "50%";
-//         yesBtn.style.left = "50%";
-//         yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
-//     }else{
-//         yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
-//     }
-// });
-
-// YES is clicked
+// ---------------- YES Button ----------------
 
 yesBtn.addEventListener("click", () => {
     title.textContent = "Yippeeee!";
-
     catImg.src = "cat_dance.gif";
 
     document.querySelector(".letter-window").classList.add("final");
 
     buttons.style.display = "none";
-
     finalText.style.display = "block";
 });
